@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const { ObjectId } = require("mongodb");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
 const app = express();
@@ -45,9 +46,54 @@ app.get('/allusers', async (req, res) => {
     res.json(results);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error fetching active users');
+    res.status(500).send('Error fetching all users');
   }
 });
+
+// tips_db and tips_collection
+
+app.get('/publictips', async (req, res) => {
+  try {
+    const collection = client.db("tips_db").collection("tips_collection");
+    const results = await collection.find({availability:"Public"}).toArray();
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching all users');
+  }
+});
+
+
+app.get('/toptips', async (req, res) => {
+  try {
+    const collection = client.db("tips_db").collection("tips_collection");
+    const results = await collection.find({availability:"Public"}).limit(6).toArray();
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching all users');
+  }
+});
+
+
+app.get('/tips/:id', async (req, res) => {
+  try {
+    const collection = client.db("tips_db").collection("tips_collection");
+    const tipId = req.params.id;
+
+    const result = await collection.findOne({ _id: new ObjectId(tipId) });
+
+    if (!result) {
+      return res.status(404).json({ error: "Tip not found" });
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error fetching tip by ID");
+  }
+});
+
 
 
 async function startServer() {
