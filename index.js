@@ -38,6 +38,16 @@ app.get('/activeusers', async (req, res) => {
   }
 });
 
+app.get('/allusers', async (req, res) => {
+  try {
+    const collection = client.db("garden_theme").collection("active_users");
+    const results = await collection.find({}).toArray();
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching active users');
+  }
+});
 
 
 async function startServer() {
