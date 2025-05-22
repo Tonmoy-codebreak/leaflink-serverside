@@ -52,6 +52,19 @@ app.get('/allusers', async (req, res) => {
 
 // tips_db and tips_collection
 
+app.get('/alltips', async (req, res) => {
+  try {
+    const collection = client.db("tips_db").collection("tips_collection");
+    const results = await collection.find().toArray();
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching all users');
+  }
+});
+
+
+
 app.get('/publictips', async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
