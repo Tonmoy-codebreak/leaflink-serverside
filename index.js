@@ -108,6 +108,80 @@ app.get('/tips/:id', async (req, res) => {
 });
 
 
+app.post('/alltips', async (req, res) => {
+  try {
+    const collection = client.db("tips_db").collection("tips_collection");
+    const tipData = req.body;
+
+
+    const result = await collection.insertOne(tipData);
+    res.status(201).json({ message: "Tip submitted successfully", insertedId: result.insertedId });
+  } catch (error) {
+    console.error("Error submitting tip:", error);
+    res.status(500).send("Failed to submit tip");
+  }
+});
+
+
+app.get('/ownedtips', async (req, res) => {
+  try {
+    const userEmail = req.query.email;
+
+    if (!userEmail) {
+      return res.status(400).json({ error: "Email query parameter is required" });
+    }
+
+    const collection = client.db("tips_db").collection("tips_collection");
+    const results = await collection.find({email: userEmail}).toArray();
+
+    res.json(results);
+  } catch (error) {
+    console.error("Error fetching user tips:", error);
+    res.status(500).send("Failed to fetch user tips");
+  }
+});
+
+
+app.delete('/alltips/:id', async (req, res) => {
+  try {
+    const collection = client.db("tips_db").collection("tips_collection");
+    const tipId = req.params.id;
+
+    const result = await collection.deleteOne({ _id: new ObjectId(tipId) });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Tip not found" });
+    }
+
+    res.json({ message: "Tip deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting tip:", error);
+    res.status(500).send("Failed to delete tip");
+  }
+});
+
+app.put('/alltips/:id', async (req, res) => {
+  try {
+    const tipId = req.params.id;
+    const updatedTip = req.body;
+
+    const collection = client.db("tips_db").collection("tips_collection");
+
+    const result = await collection.updateOne(
+      { _id: new ObjectId(tipId) },
+      { $set: updatedTip }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: "Tip not found" });
+    }
+
+    res.json({ message: "Tip updated successfully" });
+  } catch (error) {
+    console.error("Error updating tip:", error);
+    res.status(500).send("Failed to update tip");
+  }
+});
 
 async function startServer() {
   try {
