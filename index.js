@@ -108,7 +108,7 @@ app.get('/tips/:id', async (req, res) => {
 });
 
 
-app.post('/alltips', async (req, res) => {
+app.post('/alltips', async (req, ) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
     const tipData = req.body;
@@ -141,7 +141,7 @@ app.get('/ownedtips', async (req, res) => {
   }
 });
 
-
+// show all tips
 app.delete('/alltips/:id', async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
@@ -160,6 +160,7 @@ app.delete('/alltips/:id', async (req, res) => {
   }
 });
 
+// Update tips Section
 app.put('/alltips/:id', async (req, res) => {
   try {
     const tipId = req.params.id;
