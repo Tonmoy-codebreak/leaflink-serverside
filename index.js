@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { ObjectId } = require("mongodb");
@@ -108,7 +109,7 @@ app.get('/tips/:id', async (req, res) => {
 });
 
 
-app.post('/alltips', async (req, ) => {
+app.post('/alltips', async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
     const tipData = req.body;
@@ -186,7 +187,7 @@ app.put('/alltips/:id', async (req, res) => {
 
 async function startServer() {
   try {
-    await client.connect();
+    // await client.connect();
     console.log("Connected to MongoDB");
     app.listen(port, () => {
       console.log(`LeafLink listening on port ${port}`);
