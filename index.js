@@ -64,8 +64,6 @@ app.get('/alltips', async (req, res) => {
   }
 });
 
-
-
 app.get('/publictips', async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
@@ -77,7 +75,6 @@ app.get('/publictips', async (req, res) => {
   }
 });
 
-
 app.get('/toptips', async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
@@ -88,7 +85,6 @@ app.get('/toptips', async (req, res) => {
     res.status(500).send('Error fetching all users');
   }
 });
-
 
 app.get('/tips/:id', async (req, res) => {
   try {
@@ -108,7 +104,6 @@ app.get('/tips/:id', async (req, res) => {
   }
 });
 
-
 app.post('/alltips', async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
@@ -122,7 +117,6 @@ app.post('/alltips', async (req, res) => {
     res.status(500).send("Failed to submit tip");
   }
 });
-
 
 app.get('/ownedtips', async (req, res) => {
   try {
