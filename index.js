@@ -78,7 +78,7 @@ app.get('/publictips', async (req, res) => {
 app.get('/toptips', async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
-    const results = await collection.find({availability:"Public"}).limit(6).toArray();
+    const results = await collection.find({availability:"Public"}).limit(8).toArray();
     res.json(results);
   } catch (error) {
     console.error(error);
