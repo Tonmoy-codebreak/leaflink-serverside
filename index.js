@@ -29,64 +29,70 @@ app.get("/", (req, res) => {
   res.send("Hello LeafLink Server!");
 });
 
-app.get('/activeusers', async (req, res) => {
+app.get("/activeusers", async (req, res) => {
   try {
     const collection = client.db("garden_theme").collection("active_users");
-    const results = await collection.find({status:"active"}).limit(6).toArray();
+    const results = await collection
+      .find({ status: "active" })
+      .limit(6)
+      .toArray();
     res.json(results);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error fetching active users');
+    res.status(500).send("Error fetching active users");
   }
 });
 
-app.get('/allusers', async (req, res) => {
+app.get("/allusers", async (req, res) => {
   try {
     const collection = client.db("garden_theme").collection("active_users");
     const results = await collection.find({}).toArray();
     res.json(results);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error fetching all users');
+    res.status(500).send("Error fetching all users");
   }
 });
 
 // tips_db and tips_collection
 
-app.get('/alltips', async (req, res) => {
+app.get("/alltips", async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
     const results = await collection.find().toArray();
     res.json(results);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error fetching all users');
+    res.status(500).send("Error fetching all users");
   }
 });
 
-app.get('/publictips', async (req, res) => {
+app.get("/publictips", async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
-    const results = await collection.find({availability:"Public"}).toArray();
+    const results = await collection.find({ availability: "Public" }).toArray();
     res.json(results);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error fetching all users');
+    res.status(500).send("Error fetching all users");
   }
 });
 
-app.get('/toptips', async (req, res) => {
+app.get("/toptips", async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
-    const results = await collection.find({availability:"Public"}).limit(8).toArray();
+    const results = await collection
+      .find({ availability: "Public" })
+      .limit(8)
+      .toArray();
     res.json(results);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error fetching all users');
+    res.status(500).send("Error fetching all users");
   }
 });
 
-app.get('/tips/:id', async (req, res) => {
+app.get("/tips/:id", async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
     const tipId = req.params.id;
@@ -104,30 +110,36 @@ app.get('/tips/:id', async (req, res) => {
   }
 });
 
-app.post('/alltips', async (req, res) => {
+app.post("/alltips", async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
     const tipData = req.body;
 
-
     const result = await collection.insertOne(tipData);
-    res.status(201).json({ message: "Tip submitted successfully", insertedId: result.insertedId });
+    res
+      .status(201)
+      .json({
+        message: "Tip submitted successfully",
+        insertedId: result.insertedId,
+      });
   } catch (error) {
     console.error("Error submitting tip:", error);
     res.status(500).send("Failed to submit tip");
   }
 });
 
-app.get('/ownedtips', async (req, res) => {
+app.get("/ownedtips", async (req, res) => {
   try {
     const userEmail = req.query.email;
 
     if (!userEmail) {
-      return res.status(400).json({ error: "Email query parameter is required" });
+      return res
+        .status(400)
+        .json({ error: "Email query parameter is required" });
     }
 
     const collection = client.db("tips_db").collection("tips_collection");
-    const results = await collection.find({email: userEmail}).toArray();
+    const results = await collection.find({ email: userEmail }).toArray();
 
     res.json(results);
   } catch (error) {
@@ -137,7 +149,7 @@ app.get('/ownedtips', async (req, res) => {
 });
 
 // show all tips
-app.delete('/alltips/:id', async (req, res) => {
+app.delete("/alltips/:id", async (req, res) => {
   try {
     const collection = client.db("tips_db").collection("tips_collection");
     const tipId = req.params.id;
@@ -156,7 +168,7 @@ app.delete('/alltips/:id', async (req, res) => {
 });
 
 // Update tips Section
-app.put('/alltips/:id', async (req, res) => {
+app.put("/alltips/:id", async (req, res) => {
   try {
     const tipId = req.params.id;
     const updatedTip = req.body;
@@ -176,6 +188,38 @@ app.put('/alltips/:id', async (req, res) => {
   } catch (error) {
     console.error("Error updating tip:", error);
     res.status(500).send("Failed to update tip");
+  }
+});
+
+// collecting all user data from tips_collection
+app.get("/tip-users", async (req, res) => {
+  try {
+    const collection = client.db("tips_db").collection("tips_collection");
+
+    const tips = await collection.find().toArray();
+
+    const userMap = new Map();
+
+    for (const tip of tips) {
+      if (tip.email && !userMap.has(tip.email)) {
+        userMap.set(tip.email, {
+          name: tip.name,
+          email: tip.email,
+          image: tip.image || "/default-avatar.png",
+          age: tip.age || "N/A",
+          gender: tip.gender || "N/A",
+          experience: tip.experience || "N/A",
+          totalSharedTips: 1,
+        });
+      } else if (tip.email) {
+        userMap.get(tip.email).totalSharedTips += 1;
+      }
+    }
+
+    res.json(Array.from(userMap.values()));
+  } catch (error) {
+    console.error("Error generating tip-users:", error);
+    res.status(500).send("Failed to get tip users");
   }
 });
 
